@@ -20,7 +20,12 @@ Todo test nace de una condición verificable. Si la tarea no tiene criterio de a
 | Un visitante ve la información de la disciplina. | Smoke/E2E de la home pública. |
 | Un visitante puede contactar por WhatsApp. | Test de que el enlace apunta al número configurado. |
 | Un admin puede iniciar sesión y editar una novedad. | E2E del flujo completo del panel. |
+| Un login con credenciales válidas crea sesión; con inválidas devuelve error genérico. | Integración de login. |
+| La sesión expira a las 12 h absolutas y no se refresca sola. | Integración de expiración con reloj fijo. |
+| Cerrar sesión borra la sesión actual y limpia la cookie. | Integración/E2E de logout. |
+| Los intentos fallidos de login están limitados. | Integración de rate limit. |
 | Un usuario sin permisos no accede al panel. | Integración de autorización del lado del servidor. |
+| Un editor no puede ejecutar acciones de administrador. | Integración de chequeo de rol. |
 | Un formulario rechaza datos inválidos. | Unitarias de validación + integración del endpoint. |
 | El contenido editado se refleja en el sitio público. | Integración o E2E de publicación. |
 
@@ -37,6 +42,7 @@ Todo test nace de una condición verificable. Si la tarea no tiene criterio de a
 - Route Handlers o Server Actions: validación, autorización y respuesta.
 - Repositorios contra una base de prueba.
 - Casos de error: datos inválidos, sin sesión, sin permisos, recurso inexistente.
+- **Auth:** verificación de contraseña contra el hash, comparación por hash del token de sesión, expiración a las 12 h, rate limit y chequeo de roles.
 
 ### End-to-end (los flujos que no pueden fallar)
 
@@ -44,7 +50,10 @@ Todo test nace de una condición verificable. Si la tarea no tiene criterio de a
 2. Un administrador inicia sesión.
 3. Un administrador crea o edita contenido y lo publica.
 4. Ese contenido aparece en el sitio público.
-5. Un usuario sin permisos no puede entrar al panel.
+5. Un usuario sin permisos no puede entrar al panel: sin sesión redirige a login.
+6. La sesión expira a las 12 h absolutas (reloj fijo o caso de borde) y ya no da acceso.
+7. Cerrar sesión deja de dar acceso.
+8. Un editor no puede ejecutar una acción exclusiva de admin.
 
 ### Lo que no se testea con automatización
 
@@ -93,8 +102,11 @@ Problema: no define casos, prioridades ni criterios. Genera tests de relleno que
 
 Además de los tests, antes de entregar el panel se prueba a mano:
 
-- [ ] Login con credenciales válidas y con credenciales inválidas.
-- [ ] Cerrar sesión y verificar que no se pueda volver atrás.
+- [ ] Login con credenciales válidas y con credenciales inválidas (mensaje genérico).
+- [ ] Sesión expirada (12 h): el panel redirige a login y no permite operar.
+- [ ] Rate limit: tras 5 intentos fallidos por email + IP en 15 minutos, el login se bloquea.
+- [ ] Cookie de sesión con flags correctos (`HttpOnly`, `SameSite=Lax`, `Secure` en producción).
+- [ ] Cerrar sesión: se borra la sesión actual y el botón "atrás" no vuelve a una pantalla autenticada.
 - [ ] Un usuario sin permisos no ve ni accede a rutas restringidas.
 - [ ] Crear, editar y publicar contenido; verificar el resultado en el sitio público.
 - [ ] Estado vacío y estado con datos.
@@ -117,7 +129,7 @@ Además de los tests, antes de entregar el panel se prueba a mano:
 
 La cobertura es una señal, no un objetivo. **Se prioriza por riesgo:**
 
-1. Seguridad del panel y permisos.
+1. Autenticación y seguridad del panel: login, sesión, expiración, logout, rate limit y permisos.
 2. Publicación y edición de contenido.
 3. Contacto por WhatsApp.
 4. Resto del sitio.

@@ -31,7 +31,7 @@ Cada épica tiene objetivo, alcance, fuera de alcance, historias sugeridas, crit
 
 **Camino crítico:** 1 → 7 → 9 → 11 → 12. El sitio público (3–6) puede avanzar en paralelo al panel.
 
-**Arquitectura ya definida:** Next.js 16 + Supabase (base, auth y storage). Ver [rutas](../arquitectura/rutas.md) y [base de datos](../arquitectura/base-de-datos.md).
+**Arquitectura ya definida:** Next.js 16 + Supabase (base y storage) + **autenticación propia** (tablas `users` y `sessions`, no Supabase Auth). Ver [rutas](../arquitectura/rutas.md) y [base de datos](../arquitectura/base-de-datos.md).
 
 > Hasta que exista el panel, los cambios de contenido se hacen por código. El sitio público puede publicarse antes; el panel es lo que lo vuelve autónomo para el club.
 
@@ -43,7 +43,7 @@ Cada épica tiene objetivo, alcance, fuera de alcance, historias sugeridas, crit
 
 **Objetivo:** tener un proyecto reproducible, con entornos separados y deploy automático.
 
-**Alcance:** repositorio y ramas; lint y build en CI; `.env.example` y variables de entorno; proyecto de Supabase con Auth, base y bucket `media`; migraciones iniciales; clientes de Supabase (`browser`, `server`, `proxy.ts`); deploy con HTTPS y previews por PR; dominio y DNS.
+**Alcance:** repositorio y ramas; lint y build en CI; `.env.example` y variables de entorno (incluida la service key solo de servidor); proyecto de Supabase con base y bucket `media`; migraciones iniciales con el esquema `users`/`sessions`; clientes de Supabase `public` y `admin` (solo servidor, sin proxy); deploy con HTTPS y previews por PR; dominio y DNS. La **lógica de autenticación** (login, sesión, guards) es de la Épica 7: acá solo se prepara el esquema y el entorno.
 
 **Fuera de alcance:** diseño visual, contenido y funcionalidades.
 
@@ -172,22 +172,25 @@ Cada épica tiene objetivo, alcance, fuera de alcance, historias sugeridas, crit
 
 **Prioridad:** Must · **Depende de:** 1 · **Tamaño:** L
 
-**Objetivo:** que solo las personas autorizadas administren el sitio, y que el acceso sea seguro.
+**Objetivo:** que solo las personas autorizadas administren el sitio, con una autenticación propia y segura.
 
-**Alcance:** login y logout con Supabase Auth; refresco de sesión en `src/proxy.ts`; roles `admin` y `editor` en `profiles`; protección de rutas del lado del servidor; rate limit en login; registro mínimo de acciones en `audit_log`.
+**Alcance:** autenticación propia con tablas `users` y `sessions`; creación del primer administrador con hash bcrypt; login y logout como Server Actions; contraseñas con hash bcrypt costo 12 (`bcryptjs`); token de sesión de 32 bytes guardado solo como SHA-256; cookie `silcom_session` (`HttpOnly`, `Secure` en producción, `SameSite=Lax`, `Path=/`, `Max-Age=43200`); expiración absoluta de 12 h sin refresco; rate limit de login (5 fallos por email + IP en 15 minutos); roles `admin` y `editor` en `users`; guards `requireSession()` / `requireRole()` en el layout y en cada acción; registro mínimo de acciones en `audit_log` (lectura solo `admin`).
 
-**Fuera de alcance:** login social, doble factor y autogestión de usuarios por parte del club.
+**Fuera de alcance:** OAuth, doble factor (2FA), reset de contraseña por email y autogestión de usuarios por parte del club. La recuperación de contraseña en v1 es manual/asistida por un admin.
 
-**Historias sugeridas:** integrar librería de auth; modelar roles; proteger rutas; limitar intentos de login; probar permisos.
+**Historias sugeridas:** modelar usuarios y sesiones; crear el primer admin; implementar login y logout; hashing y creación de sesión; guards de sesión y rol; rate limit; registro de auditoría; probar permisos.
 
 **Criterios de aceptación:**
 - [ ] Sin sesión válida no se accede a ninguna ruta del panel, verificado en el servidor.
-- [ ] Las contraseñas se almacenan hasheadas.
+- [ ] Las contraseñas se almacenan hasheadas (bcrypt 12) y nunca en texto plano ni en logs.
+- [ ] La cookie de sesión tiene los flags correctos y expira de forma absoluta a las 12 h.
+- [ ] Los intentos fallidos de login están limitados (5 por email + IP en 15 minutos).
+- [ ] Cerrar sesión borra la sesión actual y limpia la cookie.
+- [ ] El primer administrador se crea con hash bcrypt y puede iniciar sesión.
 - [ ] Un editor no puede ejecutar acciones de administrador.
-- [ ] Los intentos fallidos de login están limitados.
-- [ ] Los permisos tienen tests de integración.
+- [ ] Los flujos de auth y permisos tienen tests de integración/E2E.
 
-**Riesgos:** implementar auth casera; permisos solo en el cliente; complejidad innecesaria para pocos usuarios.
+**Riesgos:** permisos solo en el cliente; complejidad innecesaria para pocos usuarios; errores en el manejo del token o de la cookie.
 
 ---
 
@@ -241,7 +244,7 @@ Cada épica tiene objetivo, alcance, fuera de alcance, historias sugeridas, crit
 
 **Objetivo:** subir y reemplazar imágenes de forma segura y ordenada.
 
-**Alcance:** subida validada por tipo y tamaño al bucket `media` de Supabase Storage; optimización; texto alternativo; metadata en la tabla `media`; reemplazo y borrado.
+**Alcance:** subida validada por tipo y tamaño al bucket `media` de Supabase Storage; **escrituras solo desde el servidor** (Server Actions con service role), sin escrituras desde el cliente; optimización; texto alternativo; metadata en la tabla `media`; reemplazo y borrado.
 
 **Fuera de alcance:** edición de imágenes dentro del panel y galerías avanzadas.
 
@@ -284,7 +287,7 @@ Cada épica tiene objetivo, alcance, fuera de alcance, historias sugeridas, crit
 
 **Objetivo:** salir a producción sin deuda crítica y con una forma de detectar problemas.
 
-**Alcance:** suite de tests; auditoría de accesibilidad; SEO; performance; dominio y DNS; backups; monitoreo básico; plan de rollback.
+**Alcance:** suite de tests; auditoría de accesibilidad; SEO; performance; dominio y DNS; backups; monitoreo básico; plan de rollback; revisión de seguridad de sesión y del manejo de la service key.
 
 **Fuera de alcance:** analítica avanzada y marketing.
 
@@ -341,3 +344,4 @@ Cada épica tiene objetivo, alcance, fuera de alcance, historias sugeridas, crit
 6. ¿Cuándo entra el catálogo de productos?
 7. ¿Se recupera el dominio anterior? ¿Quién lo gestiona?
 8. ¿Hay presupuesto para Supabase y hosting?
+9. ¿Quién resetea contraseñas cuando alguien no puede entrar? (v1: manual/asistido por un admin).

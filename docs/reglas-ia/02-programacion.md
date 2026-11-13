@@ -22,27 +22,32 @@ Stack actual:
 | React | 19.3 |
 | TypeScript | Strict, sin `any` |
 | Tailwind CSS | 4.3 |
-| Supabase | Base de datos, auth y storage, vía `@supabase/ssr` |
+| Supabase | Base de datos y storage, vía `@supabase/supabase-js` (solo servidor) |
+| Autenticación | Propia (tablas `users` y `sessions`), no Supabase Auth |
 | Gestor de paquetes | `pnpm` (no usar npm, yarn ni bun) |
 | Lint | ESLint 9 |
 
 ### Next.js 16: errores que la IA suele cometer
 
-- Crear `middleware.ts`. **En Next.js 16 se llama `src/proxy.ts` y exporta `proxy()`.**
+- Crear `middleware.ts`. **En Next.js 16 se llama `src/proxy.ts` y exporta `proxy()`.** Aclaración: en v1 **no hace falta proxy**; la sesión se valida en el servidor. Solo si alguna vez se agrega uno, aplicar esta regla de nombre.
 - Usar `params`, `searchParams`, `cookies()` o `headers()` de forma sincrónica. **Son asíncronos: siempre `await`.**
-- Copiar código de Supabase para Next.js 15 con `middleware`. La lógica es la misma, el archivo y la función no.
-- Confiar en `getSession()` para autorizar. **Usar `getUser()` en el servidor.**
-- Crear un cliente de Supabase nuevo por cada componente cliente. El cliente de navegador es singleton.
+- Copiar código de Supabase Auth para Next.js con `middleware` o `src/proxy.ts`. **En este proyecto no hay Supabase Auth ni refresco de sesión en proxy.**
+- Usar `supabase.auth.getUser()` o `getSession()`. **No existen**: la sesión es propia y se valida contra la cookie `silcom_session`.
+- Usar `auth.uid()`, `auth.users`, `profiles` o `handle_new_user`. **No existen**: la autenticación es propia.
+- Crear un cliente de Supabase en el navegador. **Todos los clientes son solo de servidor.**
+- Confiar en el cliente para autorizar. **Usar `requireSession()` / `requireRole()` en el servidor.**
 
 ## 2. Decisiones de arquitectura
 
 Ya definidas:
 
 - **Base de datos:** Supabase (PostgreSQL).
-- **Autenticación:** Supabase Auth con email y contraseña. Roles en `profiles`.
-- **Storage:** Supabase Storage, bucket `media`.
-- **Acceso a datos:** cliente de Supabase con RLS. No se usa ORM en v1.
-- **Permisos:** `admin` y `editor`, verificados en el servidor y en RLS.
+- **Autenticación:** propia, con tablas `users` y `sessions`. Roles `admin` y `editor` en `users`. No se usa Supabase Auth.
+- **Sesión:** cookie `silcom_session` con expiración absoluta de 12 h.
+- **Acceso a datos:** clientes de Supabase **solo de servidor** (`public` y `admin`). El cliente `admin` usa la service key y se usa solo tras las guardas del panel.
+- **Storage:** Supabase Storage, bucket `media`; escrituras solo desde el servidor.
+- **ORM y SQL:** sin ORM en v1. No se usa SQL suelto en el runtime salvo las RPC documentadas.
+- **Permisos:** `admin` y `editor`, verificados en el servidor con `requireSession()` / `requireRole()`.
 
 Pendientes de definir antes de la épica correspondiente:
 
@@ -60,7 +65,9 @@ Si una tarea depende de una decisión pendiente, se frena y se resuelve primero.
 - **Sin `any`.** Preferir tipos explícitos e interfaces para modelos de dominio.
 - **Componentes de React:** function declarations. Arrow functions solo para callbacks.
 - **Nombres:** `camelCase` para variables y funciones, `PascalCase` para componentes y tipos, `UPPER_SNAKE_CASE` para constantes globales.
-- **Conexiones externas:** el cliente de navegador es Singleton. En el servidor, el cliente de Supabase se crea una vez por request con las cookies de esa request: no se comparte entre usuarios.
+- **Clientes de Supabase:** solo de servidor. Los clientes `public` y `admin` son módulos sin estado de sesión, por lo que pueden compartirse como módulos (`src/shared/supabase/public.ts` y `src/shared/supabase/admin.ts`). **No hay cliente de navegador.**
+- **Sesión:** propia, en la cookie `silcom_session` (`HttpOnly`, `SameSite=Lax`). La validación se hace en el servidor contra la tabla `sessions`.
+- **La service key** es solo de servidor y se usa únicamente en el cliente `admin`, después de las guardas del panel.
 - **Datos de conexión:** siempre por variables de entorno. Nunca hardcodear.
 - **Nunca exponer entidades de ORM fuera de la capa de persistencia.** Usar mappers y DTOs.
 - **No agregar dependencias nuevas** sin justificar qué problema resuelve y por qué no alcanza con lo existente.
@@ -108,13 +115,24 @@ Problema: sin alcance, sin modelo de datos, sin criterios. Resultado inrevisable
 ## 6. Seguridad del panel (no negociable)
 
 - Toda validación se hace **en el servidor**. La validación del cliente es solo experiencia de usuario.
-- Autenticación con librería probada, sesiones seguras y contraseñas hasheadas.
-- Cada ruta y acción del panel verifica permisos del lado del servidor.
+- Cada ruta y acción del panel verifica permisos del lado del servidor con `requireSession()` / `requireRole()`.
 - Nunca exponer claves, tokens ni cadenas de conexión en el cliente.
 - No devolver entidades internas ni datos innecesarios en las respuestas.
 - Proteger formularios públicos contra abuso (rate limit o captcha si aparece spam).
 - Revisar dependencias nuevas antes de instalarlas.
 - Los datos de socios son datos personales: mínimo acceso, mínimo dato, nunca en logs.
+
+### 6.1 Autenticación y sesiones
+
+- **Contraseñas:** hash bcrypt costo 12 (`bcryptjs`). Mínimo 12 caracteres y máximo 72 bytes (límite de bcrypt). Nunca texto plano, nunca en logs.
+- **Token de sesión:** 32 bytes aleatorios base64url; guardar **solo el SHA-256** en `sessions.token_hash` y comparar por hash.
+- **Cookie:** `silcom_session`, `HttpOnly`, `Secure` en producción, `SameSite=Lax`, `Path=/`, `Max-Age=43200` (12 h). Expiración absoluta, sin refresco.
+- **Rate limit:** 5 intentos fallidos por email + IP en 15 minutos, con mensaje de error genérico.
+- **Logout:** borrar la fila de sesión actual y limpiar la cookie.
+- **CSRF:** las mutaciones se hacen con Server Actions y la cookie es `SameSite=Lax`; no exponer rutas de mutación por GET.
+- **Open redirect:** sanitizar el parámetro `next` del login a una ruta interna.
+- **Service key:** solo de servidor, obligatoria para el panel, nunca con prefijo `NEXT_PUBLIC_`.
+- **Recuperación de contraseña:** manual/asistida por un admin en v1; sin flujo por email.
 
 ## 7. Errores típicos que hay que detectar
 
@@ -134,6 +152,7 @@ Problema: sin alcance, sin modelo de datos, sin criterios. Resultado inrevisable
 - [ ] `pnpm lint` sin errores.
 - [ ] `pnpm build` sin errores.
 - [ ] Tests agregados o actualizados cuando hay lógica o flujos críticos.
+- [ ] Si toca auth: tests de login, expiración de sesión, logout, rate limit y roles.
 - [ ] Sin `any`, sin secretos, sin código muerto.
 - [ ] Archivos por debajo de 300 líneas.
 - [ ] Accesibilidad básica: labels, foco, contraste, teclado.

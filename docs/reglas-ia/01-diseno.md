@@ -11,6 +11,7 @@
 4. **Accesible por defecto.** Contraste, foco visible, tamaños táctiles y textos legibles no son un paso final.
 5. **Contenido real, no lorem ipsum.** Los textos institucionales los aporta el club. La IA puede proponer borradores, nunca inventar datos.
 6. **La IA no decide la marca.** Puede proponer variantes; la elección es humana y se documenta.
+7. **La pantalla de login avisa.** Debe mostrar estado de error, mensaje de rate limit cuando corresponde y un control para mostrar/ocultar la contraseña.
 
 ## 2. Contexto visual del proyecto
 

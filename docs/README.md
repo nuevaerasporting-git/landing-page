@@ -2,6 +2,7 @@
 
 > Versión 0.1 — borrador para revisión del equipo.
 > Esta documentación es la fuente de verdad para trabajar con IA en el proyecto.
+> El contrato operativo del repo está en [`AGENTS.md`](../AGENTS.md): cualquier agente lo lee antes de tocar código.
 
 ## Qué estamos construyendo
 
@@ -16,7 +17,17 @@ Sitio web dinámico para el club de María Teresa (Santa Fe) con:
 
 El sitio público lo lee cualquier visitante. El panel lo usan pocas personas del club, con permisos acotados.
 
-**Stack:** Next.js 16 (App Router) + Supabase (base de datos, autenticación y storage) + Tailwind CSS.
+**Stack:** Next.js 16 (App Router) + Supabase (base de datos y storage) + autenticación propia + Tailwind CSS.
+
+## Decisiones de arquitectura
+
+- **Acceso a datos:** se usa el **cliente de Supabase** (`@supabase/supabase-js`) **solo en el servidor**. No se usa ORM ni SQL suelto en el runtime de la app.
+- **Migraciones:** SQL versionado en `supabase/migrations/`. Nada de cambios manuales en el dashboard.
+- **Autenticación:** propia, con tablas `users` y `sessions` (bcrypt para contraseñas, sesión de 12 h absolutas). **No se usa Supabase Auth.**
+- **Clientes de Supabase:** `src/shared/supabase/public.ts` y `src/shared/supabase/admin.ts`, ambos solo de servidor. Sin cliente de navegador.
+- **Service key:** solo de servidor, obligatoria para el panel; nunca en el cliente.
+- **Storage:** Supabase Storage, bucket `media`; escrituras solo desde el servidor.
+- **Autorización:** RLS + grants revocados sobre tablas base, y verificación de sesión y rol en el servidor.
 
 ## Puesta en marcha
 
@@ -27,7 +38,7 @@ cp .env.example .env.local
 pnpm dev
 ```
 
-`.env.local` no se commitea. Las claves reales se comparten por un canal privado, nunca por el repo ni por el chat de IA.
+`.env.local` no se commitea. Las claves reales se comparten por un canal privado, nunca por el repo ni por el chat de IA. La **service key** (`SUPABASE_SECRET_KEY`) es solo de servidor y es obligatoria para el panel; nunca se prefija con `NEXT_PUBLIC_`.
 
 ## Mapa de la documentación
 
@@ -37,6 +48,7 @@ pnpm dev
 | [Reglas de programación](./reglas-ia/02-programacion.md) | Cómo usar IA para escribir código sin romper la arquitectura ni la seguridad. | Antes de escribir cualquier línea de código. |
 | [Reglas de testeo](./reglas-ia/03-testeo.md) | Cómo usar IA para probar el sitio y el panel. | Antes de dar una tarea por terminada. |
 | [Épicas del proyecto](./producto/epicas.md) | Los objetivos grandes del producto, su alcance y su orden. | Antes de planificar tareas o issues. |
+| [Tareas de la Épica 1](./producto/tareas-epica-1.md) | Tareas concretas de fundaciones, Supabase, CI y deploy. | Al empezar a implementar. |
 | [Estructura de rutas](./arquitectura/rutas.md) | URLs, route groups, features y capa que resuelve cada pantalla. | Antes de crear una página o ruta. |
 | [Base de datos](./arquitectura/base-de-datos.md) | Tablas, relaciones, RLS, storage y forma del contenido. | Antes de tocar datos o escribir migraciones. |
 
