@@ -1,26 +1,93 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-brand: #e30613;
+  --color-ink: #151515;
+  --color-surface: #f7f7f5;
+  --color-muted: #626262;
+  --color-line: #dddddd;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    color-scheme: light;
+  }
+
+  html {
+    background-color: #ffffff;
+    scroll-padding-top: 5.5rem;
+  }
+
+  @media (min-width: 64rem) {
+    html {
+      scroll-padding-top: 6.5rem;
+    }
+  }
+
+  body {
+    background-color: #ffffff;
+    color: var(--color-ink);
+    font-family: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background-color: var(--color-brand);
+    color: #ffffff;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+
+    html {
+      scroll-behavior: auto;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@keyframes sponsors-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.sponsors-track {
+  animation: sponsors-marquee 40s linear infinite;
+  will-change: transform;
+}
+
+.sponsors-marquee:hover .sponsors-track,
+.sponsors-marquee:focus-within .sponsors-track,
+.sponsors-marquee:active .sponsors-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sponsors-track {
+    animation: none;
+  }
 }
