@@ -1,26 +1,32 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-nesc-red: #E30613;
+  --color-nesc-red-dark: #B0040E;
+  --color-nesc-white: #FFFFFF;
+  --color-nesc-black: #111111;
+  --color-nesc-gray: #F4F4F6;
+  --color-nesc-gray-mid: #4B5563;
+  --color-nesc-border: #E5E7EB;
+  --color-nesc-muted: #374151;
+
+  --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Corte diagonal inspirado en la "V" del escudo oficial NESC */
+.nesc-chevron-clip {
+  clip-path: polygon(0 0, 100% 0, 100% 82%, 50% 100%, 0 82%);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@media (min-width: 1024px) {
+  .nesc-hero-diagonal {
+    clip-path: polygon(14% 0, 100% 0, 100% 100%, 0% 100%);
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-nesc-white);
+  color: var(--color-nesc-black);
+  font-family: var(--font-sans);
 }
