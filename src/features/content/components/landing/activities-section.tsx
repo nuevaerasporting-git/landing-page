@@ -1,4 +1,7 @@
-import { ACTIVITIES } from "@/features/content/data/landing";
+import {
+  ACTIVITIES,
+  ACTIVITIES_CONTENT,
+} from "@/features/content/data/landing";
 import { MediaPlaceholder } from "@/shared/ui/media-placeholder";
 import { PendingBadge } from "@/shared/ui/pending-badge";
 import { Section } from "@/shared/ui/section";
@@ -7,11 +10,11 @@ export function ActivitiesSection() {
   return (
     <Section
       id="actividades"
-      title="Encontrá tu lugar en Nueva Era"
-      description="Un club con espacio para jugar, aprender y compartir."
+      title={ACTIVITIES_CONTENT.title}
+      description={ACTIVITIES_CONTENT.description}
       headingAside={
         <PendingBadge className="self-start">
-          Disciplinas a confirmar
+          {ACTIVITIES_CONTENT.pendingBadge}
         </PendingBadge>
       }
     >
@@ -21,7 +24,7 @@ export function ActivitiesSection() {
             <article className="flex h-full flex-col overflow-hidden rounded-lg border border-line bg-white transition-colors hover:border-brand/50">
               <span aria-hidden="true" className="h-1 w-full bg-brand" />
               <MediaPlaceholder
-                label="Imagen del club pendiente"
+                label={ACTIVITIES_CONTENT.mediaLabel}
                 framed={false}
                 className="aspect-[4/3]"
               />
@@ -30,11 +33,11 @@ export function ActivitiesSection() {
                   {activity.name}
                 </h3>
                 <a
-                  href="#asociate"
-                  aria-label={`Consultar sobre ${activity.name}`}
+                  href={ACTIVITIES_CONTENT.cardCta.href}
+                  aria-label={activity.consultationAriaLabel}
                   className="mt-auto inline-flex min-h-11 items-center pt-3 text-sm font-semibold text-brand underline-offset-4 hover:underline"
                 >
-                  Consultar actividad
+                  {ACTIVITIES_CONTENT.cardCta.label}
                 </a>
               </div>
             </article>
@@ -43,8 +46,7 @@ export function ActivitiesSection() {
       </ul>
 
       <p className="mt-5 text-sm leading-relaxed text-muted">
-        La oferta actual de disciplinas, categorías y horarios está pendiente de
-        confirmación con el club.
+        {ACTIVITIES_CONTENT.note}
       </p>
     </Section>
   );

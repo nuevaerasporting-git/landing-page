@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Montserrat } from "next/font/google";
 import type { ReactNode } from "react";
+import { SITE_CONTENT } from "@/features/content/data/site";
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -10,9 +11,8 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "Nueva Era Sporting Club | María Teresa, Santa Fe",
-  description:
-    "Deporte, comunidad y momentos compartidos en Nueva Era Sporting Club. Conocé las actividades y cómo asociarte.",
+  title: SITE_CONTENT.metadata.title,
+  description: SITE_CONTENT.metadata.description,
 };
 
 export const viewport: Viewport = {

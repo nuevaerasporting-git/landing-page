@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { SITE_CONTENT } from "@/features/content/data/site";
 import { cn } from "@/shared/lib/cn";
 
 type SiteWordmarkTone = "light" | "dark";
@@ -15,14 +16,15 @@ export function SiteWordmark({
   className,
 }: SiteWordmarkProps) {
   const isDark = tone === "dark";
+  const { image, primaryLine, secondaryLine } = SITE_CONTENT.wordmark;
 
   return (
     <span className={cn("flex items-center gap-2.5 sm:gap-3", className)}>
       <Image
-        src="/nesc-escudo-manual.png"
-        alt=""
-        width={430}
-        height={463}
+        src={image.src}
+        alt={image.alt}
+        width={image.width}
+        height={image.height}
         preload={preload}
         className="h-11 w-auto sm:h-12 lg:h-14"
       />
@@ -33,7 +35,7 @@ export function SiteWordmark({
             isDark ? "text-white" : "text-ink",
           )}
         >
-          Nueva Era
+          {primaryLine}
         </span>
         <span
           className={cn(
@@ -41,7 +43,7 @@ export function SiteWordmark({
             isDark ? "text-white/60" : "text-muted",
           )}
         >
-          Sporting Club
+          {secondaryLine}
         </span>
       </span>
     </span>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { SITE_CONTENT } from "@/features/content/data/site";
 import type { NavItem } from "@/features/content/types/landing";
 import { ButtonLink } from "@/shared/ui/button-link";
 
@@ -12,6 +13,7 @@ export function MobileNav({ items }: MobileNavProps) {
   const [isOpen, setIsOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const { mobileNav } = SITE_CONTENT;
 
   useEffect(() => {
     if (!isOpen) return;
@@ -49,7 +51,7 @@ export function MobileNav({ items }: MobileNavProps) {
         type="button"
         aria-expanded={isOpen}
         aria-controls="mobile-menu"
-        aria-label={isOpen ? "Cerrar menú" : "Abrir menú"}
+        aria-label={isOpen ? mobileNav.closeMenuLabel : mobileNav.openMenuLabel}
         onClick={() => setIsOpen((open) => !open)}
         className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-line text-ink transition-colors hover:border-brand hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
       >
@@ -62,7 +64,7 @@ export function MobileNav({ items }: MobileNavProps) {
         className="absolute inset-x-0 top-full border-b border-line bg-white shadow-sm"
       >
         <nav
-          aria-label="Navegación móvil"
+          aria-label={mobileNav.navLabel}
           className="mx-auto w-full max-w-6xl px-4 py-4 sm:px-6"
         >
           <ul className="flex flex-col">
@@ -79,11 +81,11 @@ export function MobileNav({ items }: MobileNavProps) {
             ))}
           </ul>
           <ButtonLink
-            href="#asociate"
+            href={mobileNav.cta.href}
             onClick={closeMenu}
             className="mt-4 w-full"
           >
-            Quiero asociarme
+            {mobileNav.cta.label}
           </ButtonLink>
         </nav>
       </div>

@@ -1,3 +1,4 @@
+import { HERO_CONTENT } from "@/features/content/data/landing";
 import { ButtonLink } from "@/shared/ui/button-link";
 import { Container } from "@/shared/ui/container";
 import { MediaPlaceholder } from "@/shared/ui/media-placeholder";
@@ -9,32 +10,31 @@ export function HeroSection() {
         <div>
           <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-white/70">
             <span aria-hidden="true" className="h-px w-8 bg-brand" />
-            María Teresa · Santa Fe
+            {HERO_CONTENT.eyebrow}
           </p>
 
           <h1 className="mt-6 max-w-2xl text-balance text-4xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-6xl">
-            Mucho más que un club.{" "}
-            <span className="text-brand">Un lugar para encontrarnos.</span>
+            {HERO_CONTENT.titleLead}{" "}
+            <span className="text-brand">{HERO_CONTENT.titleEmphasis}</span>
           </h1>
 
           <p className="mt-4 max-w-xl text-base leading-relaxed text-white/80 sm:text-lg">
-            Deporte, comunidad y momentos compartidos en Nueva Era Sporting
-            Club.
+            {HERO_CONTENT.subtitle}
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <ButtonLink
-              href="#asociate"
+              href={HERO_CONTENT.primaryCta.href}
               className="focus-visible:outline-white!"
             >
-              Quiero asociarme
+              {HERO_CONTENT.primaryCta.label}
             </ButtonLink>
             <ButtonLink
-              href="#actividades"
+              href={HERO_CONTENT.secondaryCta.href}
               variant="secondary"
               className="focus-visible:outline-white!"
             >
-              Conocé las actividades
+              {HERO_CONTENT.secondaryCta.label}
             </ButtonLink>
           </div>
 
@@ -43,7 +43,7 @@ export function HeroSection() {
               aria-hidden="true"
               className="h-1.5 w-1.5 rounded-full bg-brand"
             />
-            Desde 1961, parte de la comunidad de María Teresa.
+            {HERO_CONTENT.note}
           </p>
         </div>
 
@@ -54,8 +54,8 @@ export function HeroSection() {
           />
           <MediaPlaceholder
             tone="dark"
-            label="Imagen del club pendiente"
-            detail="Foto de deporte y comunidad"
+            label={HERO_CONTENT.media.label}
+            detail={HERO_CONTENT.media.detail}
             className="relative aspect-[4/3] sm:aspect-[16/9] lg:aspect-[5/4]"
           />
         </div>

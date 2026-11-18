@@ -1,8 +1,10 @@
-import { NAV_ITEMS } from "@/features/content/data/landing";
+import { SITE_CONTENT } from "@/features/content/data/site";
 import { Container } from "@/shared/ui/container";
 import { SiteWordmark } from "./site-wordmark";
 
 export function SiteFooter() {
+  const { footer } = SITE_CONTENT;
+
   return (
     <footer id="contacto" className="bg-ink text-white">
       <Container className="py-12">
@@ -10,17 +12,19 @@ export function SiteFooter() {
           <div>
             <SiteWordmark tone="dark" />
             <p className="mt-4 text-sm text-white/70">
-              María Teresa, Santa Fe
+              {footer.locationPrimary}
             </p>
-            <p className="mt-1 text-sm text-white/70">Argentina</p>
+            <p className="mt-1 text-sm text-white/70">
+              {footer.locationSecondary}
+            </p>
           </div>
 
-          <nav aria-label="Enlaces del pie de página">
+          <nav aria-label={footer.navLabel}>
             <h2 className="text-sm font-bold uppercase tracking-[0.12em]">
-              Secciones
+              {footer.sectionsLabel}
             </h2>
             <ul className="mt-4">
-              {NAV_ITEMS.map((item) => (
+              {SITE_CONTENT.navigation.map((item) => (
                 <li key={item.href}>
                   <a
                     href={item.href}
@@ -35,27 +39,26 @@ export function SiteFooter() {
 
           <div>
             <h2 className="text-sm font-bold uppercase tracking-[0.12em]">
-              Contacto
+              {footer.contactLabel}
             </h2>
             <p className="mt-4 text-sm leading-relaxed text-white/75">
-              Próximamente publicaremos los canales oficiales de contacto y
-              redes sociales.
+              {footer.contactDescription}
             </p>
           </div>
 
           <div>
             <h2 className="text-sm font-bold uppercase tracking-[0.12em]">
-              Ubicación
+              {footer.locationLabel}
             </h2>
             <p className="mt-4 text-sm leading-relaxed text-white/75">
-              Polideportivo: Sáenz Peña y Sarmiento, María Teresa, Santa Fe.
+              {footer.locationDescription}
             </p>
           </div>
         </div>
 
         <div className="mt-8 border-t border-white/15 pt-6">
           <p className="text-xs leading-relaxed text-white/60">
-            Nueva Era Sporting Club. Todos los derechos reservados.
+            {footer.copyright}
           </p>
         </div>
       </Container>

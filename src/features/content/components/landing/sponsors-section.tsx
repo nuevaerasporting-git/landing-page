@@ -1,4 +1,7 @@
-import { SPONSOR_PLACEHOLDERS } from "@/features/content/data/landing";
+import {
+  SPONSORS_CONTENT,
+  SPONSOR_PLACEHOLDERS,
+} from "@/features/content/data/landing";
 import { Section } from "@/shared/ui/section";
 
 function SponsorSlot() {
@@ -9,7 +12,7 @@ function SponsorSlot() {
         className="h-1.5 w-1.5 rounded-full bg-brand/40"
       />
       <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted">
-        Logo pendiente
+        {SPONSORS_CONTENT.slotLabel}
       </span>
     </div>
   );
@@ -20,15 +23,14 @@ export function SponsorsSection() {
     <Section
       id="patrocinadores"
       tone="surface"
-      title="Quienes nos acompañan"
-      description="Este espacio está reservado para las marcas que acompañan al club."
+      title={SPONSORS_CONTENT.title}
+      description={SPONSORS_CONTENT.description}
     >
       <div className="overflow-hidden rounded-lg border border-line bg-white">
         <span aria-hidden="true" className="block h-1 w-full bg-brand" />
         <div className="relative py-4 sm:py-6">
           <p id="sponsors-carousel-help" className="sr-only">
-            Carrusel automático de patrocinadores. Se pausa al pasar el cursor,
-            al enfocar o al interactuar.
+            {SPONSORS_CONTENT.carouselHelp}
           </p>
 
           <div
@@ -42,7 +44,7 @@ export function SponsorsSection() {
 
           <div
             role="region"
-            aria-label="Patrocinadores pendientes"
+            aria-label={SPONSORS_CONTENT.regionLabel}
             aria-describedby="sponsors-carousel-help"
             tabIndex={0}
             className="sponsors-marquee hidden focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-brand motion-safe:block"
@@ -82,7 +84,7 @@ export function SponsorsSection() {
       </div>
 
       <p className="mt-5 text-sm leading-relaxed text-muted">
-        Los logotipos se publican únicamente con autorización de cada marca.
+        {SPONSORS_CONTENT.note}
       </p>
     </Section>
   );
