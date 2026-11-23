@@ -1,22 +1,24 @@
 import Image from "next/image";
-import { SITE_CONTENT } from "@/features/content/data/site";
+import type { SiteWordmarkContent } from "@/features/content/types/landing";
 import { cn } from "@/shared/lib/cn";
 
 type SiteWordmarkTone = "light" | "dark";
 
 interface SiteWordmarkProps {
+  content: SiteWordmarkContent;
   tone?: SiteWordmarkTone;
   preload?: boolean;
   className?: string;
 }
 
 export function SiteWordmark({
+  content,
   tone = "light",
   preload = false,
   className,
 }: SiteWordmarkProps) {
   const isDark = tone === "dark";
-  const { image, primaryLine, secondaryLine } = SITE_CONTENT.wordmark;
+  const { image, primaryLine, secondaryLine } = content;
 
   return (
     <span className={cn("flex items-center gap-2.5 sm:gap-3", className)}>

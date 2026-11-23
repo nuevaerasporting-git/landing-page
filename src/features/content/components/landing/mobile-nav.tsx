@@ -1,19 +1,21 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { SITE_CONTENT } from "@/features/content/data/site";
-import type { NavItem } from "@/features/content/types/landing";
+import type {
+  NavItem,
+  SiteMobileNavContent,
+} from "@/features/content/types/landing";
 import { ButtonLink } from "@/shared/ui/button-link";
 
 interface MobileNavProps {
   items: NavItem[];
+  content: SiteMobileNavContent;
 }
 
-export function MobileNav({ items }: MobileNavProps) {
+export function MobileNav({ items, content }: MobileNavProps) {
   const [isOpen, setIsOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const { mobileNav } = SITE_CONTENT;
 
   useEffect(() => {
     if (!isOpen) return;
@@ -51,7 +53,9 @@ export function MobileNav({ items }: MobileNavProps) {
         type="button"
         aria-expanded={isOpen}
         aria-controls="mobile-menu"
-        aria-label={isOpen ? mobileNav.closeMenuLabel : mobileNav.openMenuLabel}
+        aria-label={
+          isOpen ? content.closeMenuLabel : content.openMenuLabel
+        }
         onClick={() => setIsOpen((open) => !open)}
         className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-line text-ink transition-colors hover:border-brand hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
       >
@@ -64,7 +68,7 @@ export function MobileNav({ items }: MobileNavProps) {
         className="absolute inset-x-0 top-full border-b border-line bg-white shadow-sm"
       >
         <nav
-          aria-label={mobileNav.navLabel}
+          aria-label={content.navLabel}
           className="mx-auto w-full max-w-6xl px-4 py-4 sm:px-6"
         >
           <ul className="flex flex-col">
@@ -81,11 +85,11 @@ export function MobileNav({ items }: MobileNavProps) {
             ))}
           </ul>
           <ButtonLink
-            href={mobileNav.cta.href}
+            href={content.cta.href}
             onClick={closeMenu}
             className="mt-4 w-full"
           >
-            {mobileNav.cta.label}
+            {content.cta.label}
           </ButtonLink>
         </nav>
       </div>

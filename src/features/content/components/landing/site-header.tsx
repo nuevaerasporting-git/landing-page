@@ -1,26 +1,30 @@
-import { SITE_CONTENT } from "@/features/content/data/site";
+import type { SiteContent } from "@/features/content/types/landing";
 import { ButtonLink } from "@/shared/ui/button-link";
 import { Container } from "@/shared/ui/container";
 import { MobileNav } from "./mobile-nav";
 import { SiteWordmark } from "./site-wordmark";
 
-export function SiteHeader() {
+interface SiteHeaderProps {
+  site: SiteContent;
+}
+
+export function SiteHeader({ site }: SiteHeaderProps) {
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-white/95 backdrop-blur">
       <Container className="flex h-16 items-center justify-between gap-4 lg:h-20">
         <a
-          href={SITE_CONTENT.header.homeHref}
-          aria-label={SITE_CONTENT.header.homeAriaLabel}
+          href={site.header.homeHref}
+          aria-label={site.header.homeAriaLabel}
           className="inline-flex min-h-11 items-center rounded-sm"
         >
-          <SiteWordmark preload />
+          <SiteWordmark content={site.wordmark} preload />
         </a>
 
         <nav
-          aria-label={SITE_CONTENT.header.primaryNavLabel}
+          aria-label={site.header.primaryNavLabel}
           className="hidden items-center gap-1 lg:flex"
         >
-          {SITE_CONTENT.navigation.map((item) => (
+          {site.navigation.map((item) => (
             <a
               key={item.href}
               href={item.href}
@@ -32,12 +36,12 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden lg:block">
-          <ButtonLink href={SITE_CONTENT.header.cta.href}>
-            {SITE_CONTENT.header.cta.label}
+          <ButtonLink href={site.header.cta.href}>
+            {site.header.cta.label}
           </ButtonLink>
         </div>
 
-        <MobileNav items={SITE_CONTENT.navigation} />
+        <MobileNav items={site.navigation} content={site.mobileNav} />
       </Container>
     </header>
   );

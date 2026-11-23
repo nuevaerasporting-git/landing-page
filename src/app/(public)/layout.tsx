@@ -1,22 +1,30 @@
-import type { ReactNode } from "react";
-import { SiteFooter } from "@/features/content/components/landing/site-footer";
-import { SiteHeader } from "@/features/content/components/landing/site-header";
+import type { Metadata } from "next";
+import { connection } from "next/server";
+import { Suspense, type ReactNode } from "react";
+import {
+  PublicChrome,
+  SiteChrome,
+} from "@/features/content/components/landing/public-chrome";
 import { SITE_CONTENT } from "@/features/content/data/site";
+import { getMappedSiteContent } from "@/features/content/services/site-content";
+
+export async function generateMetadata(): Promise<Metadata> {
+  await connection();
+  const content = await getMappedSiteContent();
+  const metadata = content?.site.metadata ?? SITE_CONTENT.metadata;
+
+  return {
+    title: metadata.title,
+    description: metadata.description,
+  };
+}
 
 export default function PublicLayout({ children }: { children: ReactNode }) {
   return (
-    <>
-      <a
-        href="#contenido"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-ink focus:px-4 focus:py-3 focus:text-sm focus:font-semibold focus:text-white"
-      >
-        {SITE_CONTENT.accessibility.skipLinkLabel}
-      </a>
-      <SiteHeader />
-      <main id="contenido" tabIndex={-1} className="flex-1">
-        {children}
-      </main>
-      <SiteFooter />
-    </>
+    <Suspense
+      fallback={<PublicChrome site={SITE_CONTENT}>{children}</PublicChrome>}
+    >
+      <SiteChrome>{children}</SiteChrome>
+    </Suspense>
   );
 }

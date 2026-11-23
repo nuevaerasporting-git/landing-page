@@ -1,16 +1,20 @@
-import { SITE_CONTENT } from "@/features/content/data/site";
+import type { SiteContent } from "@/features/content/types/landing";
 import { Container } from "@/shared/ui/container";
 import { SiteWordmark } from "./site-wordmark";
 
-export function SiteFooter() {
-  const { footer } = SITE_CONTENT;
+interface SiteFooterProps {
+  site: SiteContent;
+}
+
+export function SiteFooter({ site }: SiteFooterProps) {
+  const { footer, navigation } = site;
 
   return (
     <footer id="contacto" className="bg-ink text-white">
       <Container className="py-12">
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4 lg:gap-8">
           <div>
-            <SiteWordmark tone="dark" />
+            <SiteWordmark content={site.wordmark} tone="dark" />
             <p className="mt-4 text-sm text-white/70">
               {footer.locationPrimary}
             </p>
@@ -24,7 +28,7 @@ export function SiteFooter() {
               {footer.sectionsLabel}
             </h2>
             <ul className="mt-4">
-              {SITE_CONTENT.navigation.map((item) => (
+              {navigation.map((item) => (
                 <li key={item.href}>
                   <a
                     href={item.href}

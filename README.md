@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Cómo funciona la subida de imágenes a Supabase
 
-## Getting Started
+La subida ya está implementada en `src/features/media/`. Desde cualquier formulario se usa el componente `ImageUploader`, que arma un `FormData` con la imagen y la clave de la sección, y llama a la Server Action `uploadImage`.
 
-First, run the development server:
+Flujo:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. El componente envía los campos `section` e `image`.
+2. La action valida la sección contra la lista permitida (`SECTION_KEYS`) y la imagen (5 MB máximo, solo JPEG, PNG, WebP o AVIF, comparando el tipo declarado con los magic bytes).
+3. Sube el archivo al bucket público `media` con ruta `media/<sección>/<uuid>.<ext>`, usando la secret key solo desde el servidor.
+4. Devuelve `{ ok: true, path, publicUrl }`, o `{ ok: false, error }` con un mensaje en español.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+El bucket se crea con `supabase/media-bucket.sql` (público, límite de 5 MB y esos cuatro tipos MIME). En Storage no hay carpetas reales: `hero/` y `sponsors/` son prefijos del nombre del objeto. `next.config.ts` habilita las imágenes remotas de Supabase y eleva el límite de Server Actions a 6 MB.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Qué incluye
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Selector reutilizable con vista previa, arrastrar y soltar, estados de carga y error.
+- Validación de sección, tamaño, tipo declarado y contenido real del archivo.
+- Extensión canónica y nombre único por imagen (`uuid`), sin sobrescribir archivos.
+- Lectura de credenciales desde variables de entorno y acceso al bucket solo con secret key en servidor.
 
-## Learn More
+### Qué no incluye
 
-To learn more about Next.js, take a look at the following resources:
+- Inserción del registro en la tabla de imágenes.
+- Escritura del identificador o la URL en el JSONB de la sección.
+- Control de acceso: la action no autentica ni autoriza.
+- Borrado, reemplazo ni verificación de referencias antes de borrar.
+- Extracción de dimensiones de la imagen.
+- Migración de los archivos que ya estén en la raíz del bucket sin prefijo.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Consideraciones para el CRUD de cada sección
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+La action solo devuelve `path` y `publicUrl`. Guardar el registro, escribir en `sections`, sumar auth y resolver borrados lo hace cada integrante en su CRUD. Las claves válidas de sección son `hero`, `activities`, `membership`, `news`, `sponsors` y `site`; están definidas en un único lugar (`src/features/content/utils/section-keys.ts`) y el editor admin usa las mismas claves en `/admin/contenido/<sección>`.
 
-## Deploy on Vercel
+Dos puntos a no olvidar:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Si el insert en la tabla falla después de subir el archivo, hay que borrar el archivo para no dejar basura.
+- Antes de borrar una imagen, conviene chequear si alguna sección la está usando, porque el JSONB no tiene foreign keys que lo impidan.

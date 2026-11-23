@@ -21,7 +21,11 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="es-AR" className={`${montserrat.variable} h-full`}>
+    <html
+      lang="es-AR"
+      className={`${montserrat.variable} h-full`}
+      data-scroll-behavior="smooth"
+    >
       <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );
