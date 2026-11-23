@@ -136,13 +136,13 @@ Todos los clientes son **solo de servidor**. La app no usa el cliente de Supabas
 
 | Archivo | Uso | Regla |
 | --- | --- | --- |
-| `src/shared/supabase/public.ts` | Lecturas públicas del sitio | Solo servidor. Usa `SUPABASE_URL` + `SUPABASE_PUBLISHABLE_KEY`. Lee vistas públicas. |
+| `src/shared/supabase/public.ts` | Lecturas públicas del sitio | Solo servidor. Usa `SUPABASE_URL` + `SUPABASE_PUBLISHABLE_KEY`. Hoy lee `site_configurations`; las vistas públicas son trabajo futuro. |
 | `src/shared/supabase/admin.ts` | Panel de administración | Solo servidor. Usa `SUPABASE_URL` + `SUPABASE_SECRET_KEY`. Bypassea RLS y se usa solo tras `requireSession`/`requireRole`. |
 
 - **No hay cliente de navegador** ni `createBrowserClient`.
 - **No hay `createServerClient` con cookies de Supabase.** La sesión es propia.
 - El **service key / secret key** es obligatorio en el runtime del servidor para el panel. **Nunca** en el cliente ni con prefijo `NEXT_PUBLIC_`.
-- El sitio público lee con la clave pública a través de las vistas; no necesita privilegios extra.
+- El sitio público lee `site_configurations` con la clave pública y un grant de `select` a `anon`; no necesita privilegios extra.
 - **No se usa `getUser()` ni `getSession()`.** La sesión se valida contra la cookie propia `silcom_session` y la tabla `sessions`.
 
 ## 8. Reglas de implementación de rutas

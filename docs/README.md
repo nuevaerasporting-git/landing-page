@@ -27,7 +27,7 @@ El sitio público lo lee cualquier visitante. El panel lo usan pocas personas de
 - **Clientes de Supabase:** `src/shared/supabase/public.ts` y `src/shared/supabase/admin.ts`, ambos solo de servidor. Sin cliente de navegador.
 - **Service key:** solo de servidor, obligatoria para el panel; nunca en el cliente.
 - **Storage:** Supabase Storage, bucket `media`; escrituras solo desde el servidor.
-- **Autorización:** RLS + grants revocados sobre tablas base, y verificación de sesión y rol en el servidor.
+- **Acceso público:** RLS + grant de `select` a `anon` sobre `site_configurations`; el modelo de vistas con grants revocados es trabajo futuro.
 
 ## Puesta en marcha
 

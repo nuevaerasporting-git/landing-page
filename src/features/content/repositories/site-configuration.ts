@@ -25,7 +25,7 @@ export async function getSiteSections(
       .maybeSingle();
 
     if (error) {
-      console.warn("[site-configuration] Could not read site sections");
+      console.warn(`[site-configuration] Could not read site sections: ${error.message}`);
       return null;
     }
 

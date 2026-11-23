@@ -18,7 +18,7 @@ La base guarda el contenido editable del sitio, la configuración global, las im
 - Fechas `timestamptz` con `now()`.
 - `updated_at` se actualiza con trigger, no desde la aplicación.
 - **Sin Supabase Auth.** No existen `auth.users`, `profiles` ni `handle_new_user`.
-- **RLS activo en todas las tablas**, y además se **revocan los grants directos** de `select/insert/update/delete` sobre las tablas base a `anon` y `authenticated`. El público lee solo a través de vistas controladas.
+- **RLS activo en todas las tablas.** Hoy el sitio público hace un `SELECT` directo sobre `site_configurations` con un grant de `select` a `anon`: no hay datos por usuario ni autenticación que restrinja esas lecturas. El modelo de vistas controladas es trabajo futuro (sección 6).
 - **La service key es solo de servidor.** Bypassea RLS y se usa únicamente después de `requireSession`/`requireRole` en la capa del panel. Nunca en el navegador.
 - Los borradores nunca son visibles para el sitio público.
 
@@ -201,20 +201,22 @@ La autenticación no depende de Supabase Auth. Estas reglas aplican a toda imple
 
 ## 6. Vistas públicas
 
-El sitio público lee vistas, no las tablas directamente. **La vista es el límite de seguridad público:** expone solo columnas seguras y filtra el contenido publicado.
+**Estado actual:** el sitio público lee directamente `site_configurations` con la clave publishable y un grant de `select` a `anon`. La app usa `SITE_CONTENT` como fallback cuando la consulta falla o no devuelve datos. Como no hay datos por usuario ni autenticación en esta lectura, no aplica una política por fila.
 
-| Vista | Expone | Filtro |
+**Trabajo futuro (no requerido hoy):** mover estas lecturas a vistas `security definer` con columnas explícitas y grants revocados sobre las tablas base.
+
+| Vista (futura) | Expone | Filtro |
 | --- | --- | --- |
 | `published_content` | `key`, `page`, `block_type`, `content`, `sort_order`, `published_at` | Solo `status = 'published'`. |
 | `public_site_settings` | Datos de contacto, redes y SEO | Omite `updated_by` y `updated_at`. |
 | `public_media` | `id`, `path`, `alt_text`, `mime_type`, `width`, `height` | Solo metadata segura de imágenes. |
 
-**Reglas de las vistas:**
+**Reglas de las vistas (cuando se implementen):**
 
-- Se crean como vistas **security definer** propiedad de `postgres`, con listas de columnas estrictas y filtros explícitos. La vista es el límite de seguridad público.
-- Se otorga `select` a `anon` **solo sobre las vistas**, nunca sobre las tablas base.
-- Se **revocan** los grants directos de `select/insert/update/delete` sobre las tablas base a `anon` y `authenticated`.
-- `public_media` no expone `bucket`, `size_bytes`, `uploaded_by` ni `created_at`.
+- Se crearán como vistas **security definer** propiedad de `postgres`, con listas de columnas estrictas y filtros explícitos. La vista sería el límite de seguridad público.
+- Se otorgará `select` a `anon` **solo sobre las vistas**, nunca sobre las tablas base.
+- Se revocarán los grants directos de `select/insert/update/delete` sobre las tablas base a `anon` y `authenticated`.
+- `public_media` no expondrá `bucket`, `size_bytes`, `uploaded_by` ni `created_at`.
 
 ## 7. RLS inicial
 
@@ -225,17 +227,17 @@ RLS se mantiene activo en todas las tablas. Como no hay usuarios de Supabase Aut
 | `users` | Sin acceso | Sin acceso (no se usa) | Lee y escribe (solo servidor, tras guarda) |
 | `sessions` | Sin acceso | Sin acceso (no se usa) | Lee y escribe (solo servidor, tras guarda) |
 | `login_attempts` | Sin acceso | Sin acceso (no se usa) | Lee y escribe (solo servidor) |
-| `site_settings` | Lee `public_site_settings` (vista) | Sin acceso (no se usa) | Lee y actualiza |
-| `content_blocks` | Lee `published_content` (vista) | Sin acceso (no se usa) | Lee todo; crea, edita y publica |
+| `site_settings` (hoy: `site_configurations`) | `SELECT` directo sobre `site_configurations` | Sin acceso (no se usa) | Lee y actualiza |
+| `content_blocks` | Sin acceso hoy; lectura futura vía `published_content` | Sin acceso (no se usa) | Lee todo; crea, edita y publica |
 | `content_revisions` | Sin acceso | Sin acceso (no se usa) | Lee |
-| `media` | Lee `public_media` (vista) | Sin acceso (no se usa) | Crea, edita y borra |
+| `media` | Sin acceso hoy; lectura futura vía `public_media` | Sin acceso (no se usa) | Crea, edita y borra |
 | `audit_log` | Sin acceso | Sin acceso (no se usa) | Lee (solo admin) |
 | Storage `media` | Lee archivos públicos | Sin acceso (no se usa) | Sube, reemplaza y borra |
 
 Reglas:
 
 - **No existe `current_user_role()`** ni ningún helper basado en `auth.uid()`: no hay usuarios de Supabase Auth.
-- **Se revocan los grants directos** sobre las tablas base a `anon` y `authenticated`. El público solo lee vistas.
+- **Estado actual:** se otorga `select` a `anon` sobre `site_configurations`. La revocación de grants directos y el uso exclusivo de vistas son trabajo futuro (sección 6).
 - **El service role bypassa RLS.** Se usa únicamente en el servidor, después de `requireSession`/`requireRole` en la capa del panel. Nunca en el navegador.
 - El control de autorización real (quién puede editar o publicar) vive en el código del servidor, no en políticas de RLS basadas en auth.
 - Un editor puede publicar directo. Si el club quiere aprobación previa, se agrega un estado y un permiso nuevo.
