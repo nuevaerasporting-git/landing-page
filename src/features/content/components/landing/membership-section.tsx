@@ -1,4 +1,5 @@
 import type { MembershipContent } from "@/features/content/types/landing";
+import { AssociateForm } from "@/features/content/components/landing/associate-form";
 import { Container } from "@/shared/ui/container";
 
 interface MembershipSectionProps {
@@ -22,12 +23,7 @@ export function MembershipSection({ content }: MembershipSectionProps) {
             </p>
           </div>
 
-          <a
-            href={content.cta.href}
-            className="inline-flex min-h-12 w-full items-center justify-center rounded-md bg-white px-7 py-3 text-sm font-semibold text-brand transition-colors hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:w-auto"
-          >
-            {content.cta.label}
-          </a>
+          <AssociateForm submitLabel={content.cta.label} />
         </div>
       </Container>
     </section>
