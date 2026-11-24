@@ -1,6 +1,7 @@
 import type {
   ActivitiesContent,
   Activity,
+  CtaLink,
   HeroContent,
   MembershipBlock,
   MembershipContent,
@@ -8,6 +9,7 @@ import type {
   SiteContent,
   SponsorsContent,
 } from "@/features/content/types/landing";
+import type { StoredActivityCard } from "@/features/content/types/activities";
 import type { Sections } from "@/features/content/types/site-configuration";
 
 export interface MappedSiteContent {
@@ -24,7 +26,9 @@ export function mapSections(sections: Sections): MappedSiteContent {
     hero: mapHero(sections.hero),
     activities: {
       content: mapActivitiesContent(sections.activities),
-      items: sections.activities.items.map(mapActivity),
+      items: sections.activities.items.map((item, index) =>
+        mapActivity(item, index, sections.activities.cardCta),
+      ),
     },
     membership: {
       content: mapMembershipContent(sections.membership),
@@ -68,10 +72,19 @@ function mapActivitiesContent(
   };
 }
 
-function mapActivity(item: Activity): Activity {
+function mapActivity(
+  item: StoredActivityCard,
+  index: number,
+  fallbackCta: CtaLink,
+): Activity {
   return {
+    id: item.id ?? `legacy-${index}`,
     name: item.name,
-    consultationAriaLabel: item.consultationAriaLabel,
+    consultationAriaLabel:
+      item.consultationAriaLabel || `Consultar sobre ${item.name}`,
+    schedule: item.schedule ?? "",
+    image: item.image ?? null,
+    cta: item.cta ?? fallbackCta,
   };
 }
 

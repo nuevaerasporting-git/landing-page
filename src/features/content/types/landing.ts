@@ -3,9 +3,19 @@ export interface NavItem {
   href: string;
 }
 
+export interface ActivityImage {
+  path: string;
+  publicUrl: string;
+  alt: string;
+}
+
 export interface Activity {
+  id: string;
   name: string;
   consultationAriaLabel: string;
+  schedule: string;
+  image: ActivityImage | null;
+  cta: CtaLink;
 }
 
 export interface MembershipBlock {

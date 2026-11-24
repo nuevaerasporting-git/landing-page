@@ -24,7 +24,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             <AdminNavLinks />
           </div>
           <div className="border-t border-line px-6 py-4 text-xs leading-relaxed text-muted">
-            Vista de maquetación. Los cambios no se guardan.
+            Actividades se guarda. Las demás secciones siguen en maquetación.
           </div>
         </aside>
 
@@ -56,7 +56,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             </div>
             <span className="ml-auto inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-muted">
               <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-brand" />
-              Solo vista
+              Edición parcial
             </span>
           </header>
           <main className="flex-1 px-4 py-8 sm:px-6 lg:px-8">{children}</main>

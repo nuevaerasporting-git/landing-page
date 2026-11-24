@@ -1,5 +1,5 @@
+import type { StoredActivityCard } from "@/features/content/types/activities";
 import type {
-  Activity,
   CtaLink,
   HeroContent,
   MembershipBlock,
@@ -13,7 +13,7 @@ export interface ActivitiesSectionData {
   cardCta: CtaLink;
   mediaLabel: string;
   note: string;
-  items: Activity[];
+  items: StoredActivityCard[];
 }
 
 export interface MembershipSectionData {

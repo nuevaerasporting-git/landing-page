@@ -62,7 +62,7 @@ function isNumberArray(value: unknown): value is number[] {
   return Array.isArray(value) && value.every((item) => typeof item === "number");
 }
 
-function hasExpectedShape(value: unknown): value is Sections {
+export function hasExpectedShape(value: unknown): value is Sections {
   if (!isRecord(value)) return false;
 
   const { hero, activities, membership, news, sponsors, site } = value;

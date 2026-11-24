@@ -29,9 +29,19 @@ El bucket se crea con `supabase/media-bucket.sql` (público, límite de 5 MB y e
 
 ## Consideraciones para el CRUD de cada sección
 
-La action solo devuelve `path` y `publicUrl`. Guardar el registro, escribir en `sections`, sumar auth y resolver borrados lo hace cada integrante en su CRUD. Las claves válidas de sección son `hero`, `activities`, `membership`, `news`, `sponsors` y `site`; están definidas en un único lugar (`src/features/content/utils/section-keys.ts`) y el editor admin usa las mismas claves en `/admin/contenido/<sección>`.
+La action de subida solo devuelve `path` y `publicUrl`. Cada CRUD es responsable de validar, persistir y resolver los borrados. Las claves válidas de sección son `hero`, `activities`, `membership`, `news`, `sponsors` y `site`; están definidas en un único lugar (`src/features/content/utils/section-keys.ts`).
 
-Dos puntos a no olvidar:
+### Actividades (CRUD completo)
 
-- Si el insert en la tabla falla después de subir el archivo, hay que borrar el archivo para no dejar basura.
-- Antes de borrar una imagen, conviene chequear si alguna sección la está usando, porque el JSONB no tiene foreign keys que lo impidan.
+El contenido se guarda en `site_configurations.sections` bajo la clave `activities`, en la fila de `SITE_DOMAIN ?? "localhost:3000"`. Las Server Actions viven en `src/features/content/actions/activities.ts` y delegan la lógica en `services/activities.ts`.
+
+- El cliente envía solo el `path` de la imagen; el servidor valida el formato y deriva el `publicUrl` con `getPublicUrl()`.
+- Si la escritura en DB falla después de subir una imagen, se borra el archivo recién subido (`rollbackUpload`).
+- Antes de borrar una imagen se recorren todos los JSONB de `site_configurations` y solo se elimina del bucket si ninguna otra sección o card la referencia.
+- Si falla la consulta de referencias, no se borra nada: se prefiere un archivo huérfano antes que romper otra sección.
+- Las actions ya revalidan `/` y `/admin/contenido/activities`.
+- El editor de `/admin/contenido/activities` permite cargar, editar y borrar cards con imagen, días/horarios y CTA propio, además de editar los textos de la cabecera.
+- La landing muestra la imagen, los horarios y el CTA de cada card; si una actividad no tiene imagen, sigue mostrando el placeholder.
+- Falta conectar los guards de sesión: cada action y `ActivitiesEditor` tienen un `TODO(auth)` para `requireRole(["admin", "editor"])`.
+
+Detalle del flujo en `src/features/content/services/activities.md` y del estado del editor en `src/features/content/components/admin/activities-editor.md`.

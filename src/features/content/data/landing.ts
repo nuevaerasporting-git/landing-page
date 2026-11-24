@@ -23,25 +23,6 @@ export const HERO_CONTENT: HeroContent = {
   },
 };
 
-export const ACTIVITIES: Activity[] = [
-  {
-    name: "Fútbol",
-    consultationAriaLabel: "Consultar sobre Fútbol",
-  },
-  {
-    name: "Hockey",
-    consultationAriaLabel: "Consultar sobre Hockey",
-  },
-  {
-    name: "Fútbol infantil",
-    consultationAriaLabel: "Consultar sobre Fútbol infantil",
-  },
-  {
-    name: "Tenis",
-    consultationAriaLabel: "Consultar sobre Tenis",
-  },
-];
-
 export const ACTIVITIES_CONTENT: ActivitiesContent = {
   title: "Encontrá tu lugar en Nueva Era",
   description: "Un club con espacio para jugar, aprender y compartir.",
@@ -50,6 +31,41 @@ export const ACTIVITIES_CONTENT: ActivitiesContent = {
   mediaLabel: "Imagen del club pendiente",
   note: "La oferta actual de disciplinas, categorías y horarios está pendiente de confirmación con el club.",
 };
+
+export const ACTIVITIES: Activity[] = [
+  {
+    id: "legacy-0",
+    name: "Fútbol",
+    consultationAriaLabel: "Consultar sobre Fútbol",
+    schedule: "",
+    image: null,
+    cta: ACTIVITIES_CONTENT.cardCta,
+  },
+  {
+    id: "legacy-1",
+    name: "Hockey",
+    consultationAriaLabel: "Consultar sobre Hockey",
+    schedule: "",
+    image: null,
+    cta: ACTIVITIES_CONTENT.cardCta,
+  },
+  {
+    id: "legacy-2",
+    name: "Fútbol infantil",
+    consultationAriaLabel: "Consultar sobre Fútbol infantil",
+    schedule: "",
+    image: null,
+    cta: ACTIVITIES_CONTENT.cardCta,
+  },
+  {
+    id: "legacy-3",
+    name: "Tenis",
+    consultationAriaLabel: "Consultar sobre Tenis",
+    schedule: "",
+    image: null,
+    cta: ACTIVITIES_CONTENT.cardCta,
+  },
+];
 
 export const MEMBERSHIP_BLOCKS: MembershipBlock[] = [
   {

@@ -9,14 +9,22 @@ import {
 } from "react";
 import type { SectionKey } from "@/features/content/types/site-configuration";
 import { uploadImage } from "@/features/media/actions/upload-image";
-import type { UploadedImage } from "@/features/media/types/media";
+import type {
+  UploadedImage,
+  UploadImageResult,
+} from "@/features/media/types/media";
+
+type ImageUploadAction = (formData: FormData) => Promise<UploadImageResult>;
 
 interface ImageUploaderProps {
   section: SectionKey;
-  value?: string;
+  value?: string | null;
   onUploaded: (result: { path: string; publicUrl: string }) => void;
   label?: string;
   disabled?: boolean;
+  uploadAction?: ImageUploadAction;
+  onRemove?: () => void;
+  removeLabel?: string;
 }
 
 const ACCEPTED_TYPES = "image/jpeg,image/png,image/webp,image/avif";
@@ -28,6 +36,9 @@ export function ImageUploader({
   onUploaded,
   label = "Imagen",
   disabled = false,
+  uploadAction,
+  onRemove,
+  removeLabel = "Quitar imagen",
 }: ImageUploaderProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploaded, setUploaded] = useState<UploadedImage | null>(null);
@@ -35,7 +46,15 @@ export function ImageUploader({
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const previewUrl = uploaded?.publicUrl ?? value;
+  const previewUrl =
+    value === undefined ? uploaded?.publicUrl : value || undefined;
+
+  function clearSelection() {
+    setUploaded(null);
+    setSelectedFile(null);
+    setError(null);
+    onRemove?.();
+  }
 
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
     setSelectedFile(event.target.files?.[0] ?? null);
@@ -71,7 +90,7 @@ export function ImageUploader({
     formData.set("image", selectedFile);
 
     try {
-      const result = await uploadImage(formData);
+      const result = await (uploadAction ?? uploadImage)(formData);
       if (!result.ok) {
         setError(result.error);
         return;
@@ -136,14 +155,26 @@ export function ImageUploader({
       </form>
 
       {previewUrl ? (
-        <div className="relative aspect-[4/3] w-full max-w-sm overflow-hidden rounded-lg border border-line bg-surface">
-          <Image
-            src={previewUrl}
-            alt={`Vista previa de ${label.toLowerCase()}`}
-            fill
-            sizes="(max-width: 640px) 100vw, 384px"
-            className="object-cover"
-          />
+        <div className="space-y-2">
+          <div className="relative aspect-[4/3] w-full max-w-sm overflow-hidden rounded-lg border border-line bg-surface">
+            <Image
+              src={previewUrl}
+              alt={`Vista previa de ${label.toLowerCase()}`}
+              fill
+              sizes="(max-width: 640px) 100vw, 384px"
+              className="object-cover"
+            />
+          </div>
+          {onRemove ? (
+            <button
+              type="button"
+              onClick={clearSelection}
+              disabled={disabled || isUploading}
+              className="inline-flex min-h-11 items-center rounded-md border border-line bg-white px-4 text-sm font-semibold text-ink transition-colors hover:border-brand disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {removeLabel}
+            </button>
+          ) : null}
         </div>
       ) : null}
     </section>

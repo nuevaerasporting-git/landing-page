@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { ActivitiesEditor } from "@/features/content/components/admin/activities-editor";
 import {
   ADMIN_SECTIONS,
   getSectionFields,
@@ -21,28 +22,50 @@ function SectionEditorSkeleton() {
   );
 }
 
+interface EditorHeadingProps {
+  label: string;
+  description?: string;
+}
+
+function EditorHeading({ label, description }: EditorHeadingProps) {
+  return (
+    <div>
+      <Link
+        href="/admin"
+        className="inline-flex min-h-11 items-center text-sm font-semibold text-muted transition-colors hover:text-brand"
+      >
+        Volver al dashboard
+      </Link>
+      <h1 className="mt-3 text-3xl font-extrabold tracking-tight">{label}</h1>
+      <p className="mt-2 text-sm leading-relaxed text-muted">{description}</p>
+    </div>
+  );
+}
+
 async function SectionEditor({ params }: SectionEditorPageProps) {
   const { section } = await params;
   if (!isSectionKey(section)) notFound();
 
   const descriptor = ADMIN_SECTIONS.find((item) => item.key === section);
-  const fields = getSectionFields(section);
   const label = descriptor?.label ?? section;
+  const heading = (
+    <EditorHeading label={label} description={descriptor?.description} />
+  );
+
+  if (section === "activities") {
+    return (
+      <div className="mx-auto w-full max-w-4xl space-y-8">
+        {heading}
+        <ActivitiesEditor />
+      </div>
+    );
+  }
+
+  const fields = getSectionFields(section);
 
   return (
     <div className="mx-auto w-full max-w-4xl space-y-8">
-      <div>
-        <Link
-          href="/admin"
-          className="inline-flex min-h-11 items-center text-sm font-semibold text-muted transition-colors hover:text-brand"
-        >
-          Volver al dashboard
-        </Link>
-        <h1 className="mt-3 text-3xl font-extrabold tracking-tight">{label}</h1>
-        <p className="mt-2 text-sm leading-relaxed text-muted">
-          {descriptor?.description}
-        </p>
-      </div>
+      {heading}
 
       <div
         role="status"
