@@ -20,6 +20,17 @@ export interface UploadedImage {
   publicUrl: string;
 }
 
+export interface UploadedImageDetails extends UploadedImage {
+  uploadToken?: string;
+}
+
+export type ImageUploadAction = (
+  formData: FormData,
+) => Promise<
+  | ({ ok: true } & UploadedImageDetails)
+  | { ok: false; error: string }
+>;
+
 export type UploadImageResult =
   | ({ ok: true } & UploadedImage)
   | { ok: false; error: string };

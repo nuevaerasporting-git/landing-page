@@ -46,7 +46,7 @@ const ADMIN_SECTION_METADATA: Record<SectionKey, Omit<AdminSection, "key">> = {
     label: "Novedades",
     route: "/admin/contenido/news",
     summary: NEWS_CONTENT.title,
-    description: "Espacios reservados para publicaciones.",
+    description: "Altas, edición y borrado de noticias del sitio.",
   },
   sponsors: {
     label: "Patrocinadores",

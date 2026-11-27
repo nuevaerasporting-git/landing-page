@@ -1,7 +1,12 @@
 import type { Sections } from "@/features/content/types/site-configuration";
 import { getPublicClient } from "@/shared/supabase/public";
 
-const DEFAULT_DOMAIN = "localhost:3000";
+export const DEFAULT_DOMAIN = "localhost:3000";
+
+export function getSiteDomain(): string {
+  return process.env.SITE_DOMAIN ?? DEFAULT_DOMAIN;
+}
+
 const FOOTER_KEYS = [
   "locationPrimary",
   "locationSecondary",
@@ -15,7 +20,7 @@ const FOOTER_KEYS = [
 ];
 
 export async function getSiteSections(
-  domain: string = process.env.SITE_DOMAIN ?? DEFAULT_DOMAIN,
+  domain: string = getSiteDomain(),
 ): Promise<Sections | null> {
   try {
     const { data, error } = await getPublicClient()
@@ -62,7 +67,7 @@ function isNumberArray(value: unknown): value is number[] {
   return Array.isArray(value) && value.every((item) => typeof item === "number");
 }
 
-function hasExpectedShape(value: unknown): value is Sections {
+export function hasExpectedShape(value: unknown): value is Sections {
   if (!isRecord(value)) return false;
 
   const { hero, activities, membership, news, sponsors, site } = value;

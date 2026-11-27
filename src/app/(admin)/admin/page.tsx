@@ -2,10 +2,10 @@ import Link from "next/link";
 import { ADMIN_SECTIONS } from "@/features/content/data/admin";
 
 const SUMMARY_CARDS = [
-  { label: "Secciones editables", value: String(ADMIN_SECTIONS.length) },
+  { label: "Secciones con CRUD", value: "1" },
   { label: "Estado del contenido", value: "Sin cambios" },
   { label: "Última actualización", value: "Sin registrar" },
-  { label: "Guardado", value: "Deshabilitado" },
+  { label: "Guardado", value: "Novedades" },
 ];
 
 export default function AdminDashboardPage() {
@@ -19,8 +19,8 @@ export default function AdminDashboardPage() {
           Panel de contenido
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
-          Vista de maquetación del panel. Las pantallas muestran el contenido
-          actual y no incluyen guardado ni edición.
+          Las secciones siguen en maquetación, excepto Novedades, que permite
+          crear, editar y eliminar noticias.
         </p>
       </header>
 
@@ -29,13 +29,14 @@ export default function AdminDashboardPage() {
         className="flex flex-col gap-2 rounded-lg border border-line bg-white p-4 sm:flex-row sm:items-center sm:justify-between"
       >
         <div>
-          <p className="text-sm font-bold">CRUD pendiente — a cargo del equipo</p>
+          <p className="text-sm font-bold">Novedades con CRUD — resto pendiente</p>
           <p className="mt-1 text-sm text-muted">
-            Cada persona implementará la edición de su sección en el panel.
+            La edición de noticias ya está disponible; las demás secciones
+            siguen en maquetación.
           </p>
         </div>
         <span className="inline-flex w-fit items-center rounded-full bg-surface px-3 py-1 text-xs font-semibold text-muted">
-          Solo lectura
+          Parcial
         </span>
       </div>
 

@@ -5,6 +5,7 @@ import type {
   MembershipBlock,
   SiteContent,
 } from "@/features/content/types/landing";
+import type { StoredNewsItem } from "@/features/content/types/news";
 
 export interface ActivitiesSectionData {
   title: string;
@@ -32,6 +33,7 @@ export interface NewsSectionData {
   cardDescription: string;
   note: string;
   placeholders: number[];
+  items?: StoredNewsItem[];
 }
 
 export interface SponsorsSectionData {

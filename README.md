@@ -35,3 +35,9 @@ Dos puntos a no olvidar:
 
 - Si el insert en la tabla falla después de subir el archivo, hay que borrar el archivo para no dejar basura.
 - Antes de borrar una imagen, conviene chequear si alguna sección la está usando, porque el JSONB no tiene foreign keys que lo impidan.
+
+### Estado del CRUD de noticias
+
+Las acciones de `src/features/content/actions/news.ts` crean, editan y eliminan noticias en `sections.news.items`, y revalidan `/` y `/admin/contenido/news`. La pantalla de `/admin/contenido/news` lista, crea, edita y elimina noticias, y permite subir o reemplazar la imagen con `ImageUploader`. La sección Novedades de la landing muestra las noticias publicadas, ordenadas de la más reciente a la más antigua, y conserva los placeholders cuando no hay ninguna.
+
+No hay autenticación ni autorización (`requireSession()` / `requireRole()`): **el CRUD no es apto para producción** hasta que el equipo integre esos controles.

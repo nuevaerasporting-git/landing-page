@@ -9,14 +9,18 @@ import {
 } from "react";
 import type { SectionKey } from "@/features/content/types/site-configuration";
 import { uploadImage } from "@/features/media/actions/upload-image";
-import type { UploadedImage } from "@/features/media/types/media";
+import type {
+  ImageUploadAction,
+  UploadedImageDetails,
+} from "@/features/media/types/media";
 
 interface ImageUploaderProps {
   section: SectionKey;
-  value?: string;
-  onUploaded: (result: { path: string; publicUrl: string }) => void;
+  value?: string | null;
+  onUploaded: (result: UploadedImageDetails) => void;
   label?: string;
   disabled?: boolean;
+  uploadAction?: ImageUploadAction;
 }
 
 const ACCEPTED_TYPES = "image/jpeg,image/png,image/webp,image/avif";
@@ -28,14 +32,15 @@ export function ImageUploader({
   onUploaded,
   label = "Imagen",
   disabled = false,
+  uploadAction,
 }: ImageUploaderProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [uploaded, setUploaded] = useState<UploadedImage | null>(null);
+  const [uploaded, setUploaded] = useState<UploadedImageDetails | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const previewUrl = uploaded?.publicUrl ?? value;
+  const previewUrl = uploaded?.publicUrl ?? value ?? "";
 
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
     setSelectedFile(event.target.files?.[0] ?? null);
@@ -71,15 +76,20 @@ export function ImageUploader({
     formData.set("image", selectedFile);
 
     try {
-      const result = await uploadImage(formData);
+      const action = uploadAction ?? uploadImage;
+      const result = await action(formData);
       if (!result.ok) {
         setError(result.error);
         return;
       }
 
-      const image: UploadedImage = {
+      const image: UploadedImageDetails = {
         path: result.path,
         publicUrl: result.publicUrl,
+        uploadToken:
+          "uploadToken" in result && typeof result.uploadToken === "string"
+            ? result.uploadToken
+            : undefined,
       };
       setUploaded(image);
       setSelectedFile(null);

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { NewsEditor } from "@/features/content/components/admin/news-editor";
 import {
   ADMIN_SECTIONS,
   getSectionFields,
@@ -44,51 +45,57 @@ async function SectionEditor({ params }: SectionEditorPageProps) {
         </p>
       </div>
 
-      <div
-        role="status"
-        className="flex flex-col gap-2 rounded-lg border border-line bg-white p-4 sm:flex-row sm:items-center sm:justify-between"
-      >
-        <div>
-          <p className="text-sm font-bold">CRUD pendiente — a cargo del equipo</p>
-          <p className="mt-1 text-sm text-muted">
-            Los campos se muestran deshabilitados y no hay acciones de guardado.
-          </p>
-        </div>
-        <span className="inline-flex w-fit items-center rounded-full bg-surface px-3 py-1 text-xs font-semibold text-muted">
-          Sin cambios
-        </span>
-      </div>
+      {section === "news" ? (
+        <NewsEditor />
+      ) : (
+        <>
+          <div
+            role="status"
+            className="flex flex-col gap-2 rounded-lg border border-line bg-white p-4 sm:flex-row sm:items-center sm:justify-between"
+          >
+            <div>
+              <p className="text-sm font-bold">CRUD pendiente — a cargo del equipo</p>
+              <p className="mt-1 text-sm text-muted">
+                Los campos se muestran deshabilitados y no hay acciones de guardado.
+              </p>
+            </div>
+            <span className="inline-flex w-fit items-center rounded-full bg-surface px-3 py-1 text-xs font-semibold text-muted">
+              Sin cambios
+            </span>
+          </div>
 
-      <section aria-labelledby="campos-title">
-        <h2 id="campos-title" className="text-xl font-extrabold tracking-tight">
-          Campos actuales
-        </h2>
-        <p className="mt-1 text-sm text-muted">
-          Valores de referencia de los datos locales del sitio.
-        </p>
+          <section aria-labelledby="campos-title">
+            <h2 id="campos-title" className="text-xl font-extrabold tracking-tight">
+              Campos actuales
+            </h2>
+            <p className="mt-1 text-sm text-muted">
+              Valores de referencia de los datos locales del sitio.
+            </p>
 
-        <form className="mt-4 rounded-lg border border-line bg-white p-5 sm:p-6">
-          <fieldset disabled className="grid gap-5 sm:grid-cols-2">
-            <legend className="sr-only">Campos de {label}</legend>
-            {fields.map((field, index) => (
-              <div key={`${field.label}-${index}`} className="min-w-0">
-                <label
-                  htmlFor={`campo-${index}`}
-                  className="block text-xs font-bold uppercase tracking-[0.1em] text-muted"
-                >
-                  {field.label}
-                </label>
-                <input
-                  id={`campo-${index}`}
-                  value={field.value}
-                  readOnly
-                  className="mt-2 h-11 w-full rounded-md border border-line bg-surface px-3 text-sm text-ink disabled:cursor-not-allowed disabled:opacity-70"
-                />
-              </div>
-            ))}
-          </fieldset>
-        </form>
-      </section>
+            <form className="mt-4 rounded-lg border border-line bg-white p-5 sm:p-6">
+              <fieldset disabled className="grid gap-5 sm:grid-cols-2">
+                <legend className="sr-only">Campos de {label}</legend>
+                {fields.map((field, index) => (
+                  <div key={`${field.label}-${index}`} className="min-w-0">
+                    <label
+                      htmlFor={`campo-${index}`}
+                      className="block text-xs font-bold uppercase tracking-[0.1em] text-muted"
+                    >
+                      {field.label}
+                    </label>
+                    <input
+                      id={`campo-${index}`}
+                      value={field.value}
+                      readOnly
+                      className="mt-2 h-11 w-full rounded-md border border-line bg-surface px-3 text-sm text-ink disabled:cursor-not-allowed disabled:opacity-70"
+                    />
+                  </div>
+                ))}
+              </fieldset>
+            </form>
+          </section>
+        </>
+      )}
     </div>
   );
 }
