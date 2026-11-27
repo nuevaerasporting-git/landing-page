@@ -50,9 +50,9 @@ const ADMIN_SECTION_METADATA: Record<SectionKey, Omit<AdminSection, "key">> = {
   },
   sponsors: {
     label: "Patrocinadores",
-    route: "/admin/contenido/sponsors",
+    route: "/admin/patrocinadores",
     summary: SPONSORS_CONTENT.title,
-    description: "Carrusel y texto de la sección.",
+    description: "Alta, edición y orden de las marcas que acompañan al club.",
   },
   site: {
     label: "Configuración del sitio",

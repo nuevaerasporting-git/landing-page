@@ -199,6 +199,24 @@ La autenticación no depende de Supabase Auth. Estas reglas aplican a toda imple
 | Autorización | `requireSession()` / `requireRole()` en el servidor, en el layout del panel y en cada Server Action. Roles: `admin`, `editor`. |
 | Auditoría | Las acciones sensibles se registran en `audit_log`; la lectura de auditoría es solo `admin`. |
 
+### 5.10 `sponsors`
+
+Patrocinadores gestionados desde `/admin/patrocinadores` y mostrados en la portada. Creados por la migración `20261127120000_create_sponsors.sql`.
+
+| Columna | Tipo | Nulo | Default | Notas |
+| --- | --- | --- | --- | --- |
+| `id` | `uuid` | No | `gen_random_uuid()` | PK. |
+| `name` | `text` | No | — | Único por `lower(trim(name))`; 1–80 caracteres. |
+| `logo_path` | `text` | No | — | Ruta en Storage: `sponsors/<uuid>.<ext>`. |
+| `logo_alt` | `text` | No | — | Texto alternativo obligatorio; 1–120 caracteres. |
+| `website_url` | `text` | Sí | — | Solo `http://` o `https://`. |
+| `sort_order` | `integer` | No | `0` | 0–9999. |
+| `is_active` | `boolean` | No | `true` | Permite ocultar sin borrar. |
+| `created_at` | `timestamptz` | No | `now()` | |
+| `updated_at` | `timestamptz` | No | `now()` | Trigger `set_updated_at()`. |
+
+El formulario valida en el servidor antes de escribir. La lectura pública no usa esta tabla: usa `public_sponsors`.
+
 ## 6. Vistas públicas
 
 **Estado actual:** el sitio público lee directamente `site_configurations` con la clave publishable y un grant de `select` a `anon`. La app usa `SITE_CONTENT` como fallback cuando la consulta falla o no devuelve datos. Como no hay datos por usuario ni autenticación en esta lectura, no aplica una política por fila.
@@ -210,6 +228,7 @@ La autenticación no depende de Supabase Auth. Estas reglas aplican a toda imple
 | `published_content` | `key`, `page`, `block_type`, `content`, `sort_order`, `published_at` | Solo `status = 'published'`. |
 | `public_site_settings` | Datos de contacto, redes y SEO | Omite `updated_by` y `updated_at`. |
 | `public_media` | `id`, `path`, `alt_text`, `mime_type`, `width`, `height` | Solo metadata segura de imágenes. |
+| `public_sponsors` | `id`, `name`, `logo_path`, `logo_alt`, `website_url`, `sort_order` | Solo `is_active = true`. Creada en la migración de sponsors. |
 
 **Reglas de las vistas (cuando se implementen):**
 
@@ -231,6 +250,7 @@ RLS se mantiene activo en todas las tablas. Como no hay usuarios de Supabase Aut
 | `content_blocks` | Sin acceso hoy; lectura futura vía `published_content` | Sin acceso (no se usa) | Lee todo; crea, edita y publica |
 | `content_revisions` | Sin acceso | Sin acceso (no se usa) | Lee |
 | `media` | Sin acceso hoy; lectura futura vía `public_media` | Sin acceso (no se usa) | Crea, edita y borra |
+| `sponsors` | Sin acceso; solo `public_sponsors` | Sin acceso (no se usa) | Lee, crea, edita y borra |
 | `audit_log` | Sin acceso | Sin acceso (no se usa) | Lee (solo admin) |
 | Storage `media` | Lee archivos públicos | Sin acceso (no se usa) | Sube, reemplaza y borra |
 

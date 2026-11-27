@@ -11,14 +11,15 @@ import {
   NEWS_CONTENT,
   NEWS_PLACEHOLDERS,
   SPONSORS_CONTENT,
-  SPONSOR_PLACEHOLDERS,
 } from "@/features/content/data/landing";
 import { connection } from "next/server";
 import { getMappedSiteContent } from "@/features/content/services/site-content";
+import { getPublicSponsors } from "@/features/sponsors/services/get-sponsors";
 
 export default async function HomePage() {
   await connection();
   const content = await getMappedSiteContent();
+  const sponsors = await getPublicSponsors();
 
   const hero = content?.hero ?? HERO_CONTENT;
   const activitiesContent = content?.activities.content ?? ACTIVITIES_CONTENT;
@@ -27,7 +28,6 @@ export default async function HomePage() {
   const newsContent = content?.news.content ?? NEWS_CONTENT;
   const newsSlots = content?.news.slots ?? [...NEWS_PLACEHOLDERS];
   const sponsorsContent = content?.sponsors.content ?? SPONSORS_CONTENT;
-  const sponsorSlots = content?.sponsors.slots ?? [...SPONSOR_PLACEHOLDERS];
 
   return (
     <>
@@ -35,7 +35,7 @@ export default async function HomePage() {
       <ActivitiesSection content={activitiesContent} items={activityItems} />
       <MembershipSection content={membershipContent} />
       <NewsSection content={newsContent} slots={newsSlots} />
-      <SponsorsSection content={sponsorsContent} slots={sponsorSlots} />
+      <SponsorsSection content={sponsorsContent} sponsors={sponsors} />
     </>
   );
 }

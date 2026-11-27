@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 import {
   ADMIN_SECTIONS,
@@ -24,6 +24,7 @@ function SectionEditorSkeleton() {
 async function SectionEditor({ params }: SectionEditorPageProps) {
   const { section } = await params;
   if (!isSectionKey(section)) notFound();
+  if (section === "sponsors") redirect("/admin/patrocinadores");
 
   const descriptor = ADMIN_SECTIONS.find((item) => item.key === section);
   const fields = getSectionFields(section);

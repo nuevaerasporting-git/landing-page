@@ -35,3 +35,14 @@ Dos puntos a no olvidar:
 
 - Si el insert en la tabla falla después de subir el archivo, hay que borrar el archivo para no dejar basura.
 - Antes de borrar una imagen, conviene chequear si alguna sección la está usando, porque el JSONB no tiene foreign keys que lo impidan.
+
+## CRUD de patrocinadores
+
+Está en `/admin/patrocinadores` (el viejo `/admin/contenido/sponsors` redirige ahí). Permite crear, editar, ordenar, ocultar y eliminar patrocinadores.
+
+- Campos: nombre, logo (archivo subido al bucket `media` con prefijo `sponsors/`), texto alternativo del logo, sitio web opcional, orden y estado visible/oculto.
+- Los patrocinadores activos se muestran en la sección de la portada. Si no hay ninguno, se siguen mostrando los marcadores «Logo pendiente».
+- La tabla `sponsors` y la vista pública `public_sponsors` se crean con la migración `supabase/migrations/20261127120000_create_sponsors.sql`. Aplicarla con `pnpm dlx supabase db push` antes de usar el CRUD.
+- La limpieza de logos y la revalidación de la portada se documentan en `src/features/sponsors/README.md`.
+
+**Pendiente:** el panel no tiene autenticación propia todavía, así que estas acciones no verifican sesión ni rol, igual que el resto del panel actual. La autorización se agrega en la Épica 7; no expongas el panel sin esa guarda.

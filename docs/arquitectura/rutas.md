@@ -47,6 +47,10 @@ El login vive fuera del layout del panel para no quedar atrapado en la guarda de
 | `/admin/contenido/[page]` | `src/app/(admin)/admin/contenido/[page]/page.tsx` | Bloques de una página, con estado borrador/publicado. | Editor / Admin |
 | `/admin/contenido/[page]/[blockKey]` | `src/app/(admin)/admin/contenido/[page]/[blockKey]/page.tsx` | Edición de un bloque: formulario, previsualización y publicar. | Editor / Admin |
 | `/admin/configuracion` | `src/app/(admin)/admin/configuracion/page.tsx` | WhatsApp, horarios, dirección, redes y SEO por defecto. | Editor / Admin |
+| `/admin/patrocinadores` | `src/app/(admin)/admin/patrocinadores/page.tsx` | Listado de sponsors con alta, edición, orden y borrado. | Editor / Admin |
+| `/admin/patrocinadores/nuevo` | `src/app/(admin)/admin/patrocinadores/nuevo/page.tsx` | Alta de un sponsor con logo. | Editor / Admin |
+| `/admin/patrocinadores/[id]/editar` | `src/app/(admin)/admin/patrocinadores/[id]/editar/page.tsx` | Edición de un sponsor. | Editor / Admin |
+| `/admin/patrocinadores/[id]/eliminar` | `src/app/(admin)/admin/patrocinadores/[id]/eliminar/page.tsx` | Confirmación de borrado. | Editor / Admin |
 | `/admin/imagenes` | `src/app/(admin)/admin/imagenes/page.tsx` | Subida, listado, reemplazo y borrado de imágenes. | Editor / Admin |
 | `/admin/auditoria` | `src/app/(admin)/admin/auditoria/page.tsx` | Registro de acciones del panel. | Solo Admin |
 
